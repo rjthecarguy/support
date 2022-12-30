@@ -14,7 +14,6 @@ app.use(express.urlencoded({extended:false}))
 connectDB()
 
 
-
 // User routes
 app.use('/api/users', require('./routes/userRoutes'))
 
