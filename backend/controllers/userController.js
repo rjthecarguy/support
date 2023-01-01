@@ -33,6 +33,7 @@ const registerUser = asyncHandler( async(req,res) => {
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
 
+    // Create new user
     const user = await User.create({
         name,
         email,
@@ -40,6 +41,7 @@ const registerUser = asyncHandler( async(req,res) => {
         
     })
 
+    // If user created return info and token
     if (user) {
         res.status(201).json({
             _id: user._id,
@@ -63,11 +65,13 @@ const registerUser = asyncHandler( async(req,res) => {
 
 const loginUser = asyncHandler( async(req,res) => {
 
+    // Deconstruct body
     const {email, password} = req.body
   
+    // Does user exist - search by email
     const user = await User.findOne({email})
 
-          
+     // If user exists and password matches return info and token     
      if (user && (await bcrypt.compare(password,user.password))) {
         res.status(200).json({
             id:user.id,
@@ -75,7 +79,7 @@ const loginUser = asyncHandler( async(req,res) => {
             email:user.email,
             token: generateToken(user._id)
         })
-    } else {
+    } else {  // Error out
     res.status(401)
         throw new Error("Invalid credentials")
     }
@@ -94,7 +98,7 @@ const getMe = asyncHandler( async(req,res) => {
 
 
 
-
+// Generate token
 const generateToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {
         expiresIn: "30d"
